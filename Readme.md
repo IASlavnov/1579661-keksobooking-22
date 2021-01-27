@@ -1,7 +1,7 @@
 # Личный проект «Кексобукинг»
 
 * Студент: [Игорь Славнов](https://up.htmlacademy.ru/javascript/22/user/1579661).
-* Наставник: `Неизвестно`.
+* Наставник: [Руфат Хасларов](https://up.htmlacademy.ru/javascript/22/user/372587).
 
 ---
 
