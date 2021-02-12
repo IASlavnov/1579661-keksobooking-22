@@ -43,9 +43,21 @@ const getCoordinate = (Coordinates) => {
   };
 };
 
-const getRandomArrayElement = (array) => array[getRandomInt(0, array.length - 1)];
+const getRandomArrayElement = (array) => {
+  if (!Array.isArray(array)) {
+    throw new Error('Передаваемые данные должны быть массивом');
+  }
 
-const getRandomArray = (array) => array.filter(() => Math.random() > 0.5);
+  return array[getRandomInt(0, array.length - 1)];
+};
+
+const getRandomArray = (array) => {
+  if (!Array.isArray(array)) {
+    throw new Error('Передаваемые данные должны быть массивом')
+  }
+
+  return array.filter(() => Math.random() > 0.5);
+};
 
 const createAd = () => {
   const location = getCoordinate(LocationCoordinates);
@@ -68,6 +80,6 @@ const createAd = () => {
   };
 };
 
-const ads = new Array(ADS_COUNT).fill(createAd());
+const ads = new Array(ADS_COUNT).fill(null).map(() => createAd());
 
-console.log(ads);
+ads;
