@@ -1,5 +1,8 @@
 import { getRandomInt, getCoordinate, getRandomArrayElement, getRandomArray } from './util.js';
 
+const MAX_ROOMS = 5;
+const MAX_GUESTS = 10;
+const ADS_COUNT = 10;
 const TYPES = ['palace', 'flat', 'house', 'bungalow'];
 const TIMES = ['12:00', '13:00', '14:00'];
 const FEATURES = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator'];
@@ -7,8 +10,6 @@ const PHOTOS = [
   'http://o0.github.io/assets/images/tokyo/hotel1.jpg',
   'http://o0.github.io/assets/images/tokyo/hotel2.jpg',
   'http://o0.github.io/assets/images/tokyo/hotel3.jpg'];
-const MAX_ROOMS = 5;
-const MAX_GUESTS = 10;
 const LocationCoordinates = {
   X_MIN: 35.65,
   X_MAX: 35.7,
@@ -16,7 +17,7 @@ const LocationCoordinates = {
   Y_MAX: 139.8,
   precision: 5,
 };
-const ADS_COUNT = 10;
+
 
 const createAd = () => {
   const location = getCoordinate(LocationCoordinates);
@@ -39,6 +40,6 @@ const createAd = () => {
   };
 };
 
-const ads = new Array(ADS_COUNT).fill(null).map(() => createAd());
+const getAds = () => new Array(ADS_COUNT).fill(null).map(() => createAd());
 
-export { ads };
+export { getAds };
