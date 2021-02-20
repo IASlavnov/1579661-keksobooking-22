@@ -1,3 +1,1 @@
-import { getAds } from './data.js';
-
-getAds();
+import './popup.js';
