@@ -1,5 +1,6 @@
 import { renderCards } from './render-cards.js';
 import { getAds } from './data.js';
-import './form.js';
+import { initForm } from './form.js';
 
 renderCards(getAds());
+initForm();

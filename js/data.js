@@ -11,12 +11,6 @@ const TYPE_DICTIONARY = {
   'house': 'Дом',
   'bungalow': 'Бунгало',
 };
-const TYPE_MIN_PRICE = {
-  'palace': 10000,
-  'flat': 1000,
-  'house': 5000,
-  'bungalow': 0,
-};
 const TIMES = ['12:00', '13:00', '14:00'];
 const FEATURES = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
 const PHOTOS = [
@@ -54,4 +48,4 @@ const createAd = () => {
 
 const getAds = () => new Array(ADS_COUNT).fill(null).map(() => createAd());
 
-export { getAds, TYPE_MIN_PRICE };
+export { getAds };

@@ -1,4 +1,9 @@
-import { TYPE_MIN_PRICE } from './data.js';
+const TYPE_MIN_PRICE = {
+  'palace': 10000,
+  'flat': 1000,
+  'house': 5000,
+  'bungalow': 0,
+};
 
 const form = document.querySelector('.ad-form');
 
@@ -12,11 +17,15 @@ const formType = form.querySelector('#type');
 // Цена за ночь, руб.
 const formPrice = form.querySelector('#price');
 
-formTime.addEventListener('change', (evt) => {
-  evt.target === timeIn ? timeOut.selectedIndex = timeIn.selectedIndex : timeIn.selectedIndex = timeOut.selectedIndex;
-});
+const initForm = () => {
+  formTime.addEventListener('change', (evt) => {
+    evt.target === timeIn ? timeOut.selectedIndex = timeIn.selectedIndex : timeIn.selectedIndex = timeOut.selectedIndex;
+  });
 
-formType.addEventListener('change', () => {
-  formPrice.placeholder = TYPE_MIN_PRICE[formType.value];
-  formPrice.min = TYPE_MIN_PRICE[formType.value];
-});
+  formType.addEventListener('change', () => {
+    formPrice.placeholder = TYPE_MIN_PRICE[formType.value];
+    formPrice.min = TYPE_MIN_PRICE[formType.value];
+  });
+};
+
+export { initForm };
