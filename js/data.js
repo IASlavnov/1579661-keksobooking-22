@@ -2,6 +2,7 @@ import { getRandomInt, getCoordinate, getRandomArrayElement, getRandomArray } fr
 
 const MAX_ROOMS = 5;
 const MAX_GUESTS = 10;
+const MAX_PRICE = 1000000;
 const ADS_COUNT = 10;
 const TYPES = ['palace', 'flat', 'house', 'bungalow'];
 const TYPE_DICTIONARY = {
@@ -31,7 +32,7 @@ const createAd = () => {
     offer: {
       title: 'Title',
       address: `${location.x}, ${location.y}`,
-      price: getRandomInt(1000, 20000),
+      price: getRandomInt(1000, MAX_PRICE),
       type: TYPE_DICTIONARY[getRandomArrayElement(TYPES)],
       rooms: getRandomInt(1, MAX_ROOMS),
       guests: getRandomInt(1, MAX_GUESTS),
