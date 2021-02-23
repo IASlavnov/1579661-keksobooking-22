@@ -1,32 +1,23 @@
 const adForm = document.querySelector('.ad-form');
 const mapFilters = document.querySelector('.map__filters');
 
-// Включение неактивного состояния страницы
-const enableInactiveState = () => {
+// Переключение состояния страницы в зависимости от инициализации карты
+const togglePageState = (isMapInit) => {
   for (let element of mapFilters.children) {
-    element.disabled = true;
+    element.disabled = !isMapInit;
   }
 
   for (let element of adForm.children) {
-    element.disabled = true;
+    element.disabled = !isMapInit;
   }
 
-  adForm.classList.add('ad-form--disabled');
-  mapFilters.classList.add('map__filters--disabled');
+  if (isMapInit) {
+    adForm.classList.remove('ad-form--disabled');
+    mapFilters.classList.remove('map__filters--disabled');
+  } else {
+    adForm.classList.add('ad-form--disabled');
+    mapFilters.classList.add('map__filters--disabled');
+  }
 };
 
-// Включение активного состояния страницы
-const enableActiveState = () => {
-  for (let element of mapFilters.children) {
-    element.disabled = false;
-  }
-
-  for (let element of adForm.children) {
-    element.disabled = false;
-  }
-
-  adForm.classList.remove('ad-form--disabled');
-  mapFilters.classList.remove('map__filters--disabled');
-};
-
-export { enableInactiveState, enableActiveState };
+export { togglePageState };
