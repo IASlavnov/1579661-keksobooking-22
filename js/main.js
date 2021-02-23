@@ -1,6 +1,5 @@
-import { renderCards } from './render-cards.js';
-import { getAds } from './data.js';
-import { initForm } from './form.js';
+import { initMap } from './map.js';
+import { enableInactiveState } from './page-states.js';
 
-renderCards(getAds());
-initForm();
+enableInactiveState();
+initMap();
