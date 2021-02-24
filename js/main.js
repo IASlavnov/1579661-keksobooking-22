@@ -1,6 +1,3 @@
-import { renderCards } from './render-cards.js';
-import { getAds } from './data.js';
-import { initForm } from './form.js';
+import { initMap } from './map.js';
 
-renderCards(getAds());
-initForm();
+initMap();
