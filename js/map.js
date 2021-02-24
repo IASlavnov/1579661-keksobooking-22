@@ -1,5 +1,4 @@
 /* global L:readonly */
-import { togglePageState } from './page-states.js';
 import { initForm } from './form.js';
 import { renderCard } from './render-cards.js';
 import { getAds } from './data.js';
@@ -15,8 +14,29 @@ const PIN_HEIGHT = 40;
 
 // Тестовые данные
 const points = getAds();
-// Поле ввода адреса
-const inputAddress = document.querySelector('#address');
+// Поле ввода адреса и формы
+const adForm = document.querySelector('.ad-form');
+const mapFilters = document.querySelector('.map__filters');
+const inputAddress = adForm.querySelector('#address');
+
+// Переключение состояния страницы в зависимости от инициализации карты
+const togglePageState = (isMapInit) => {
+  for (let element of mapFilters.children) {
+    element.disabled = !isMapInit;
+  }
+
+  for (let element of adForm.children) {
+    element.disabled = !isMapInit;
+  }
+
+  if (isMapInit) {
+    adForm.classList.remove('ad-form--disabled');
+    mapFilters.classList.remove('map__filters--disabled');
+  } else {
+    adForm.classList.add('ad-form--disabled');
+    mapFilters.classList.add('map__filters--disabled');
+  }
+};
 
 const setTileLayer = (map) => {
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
