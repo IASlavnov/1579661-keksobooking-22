@@ -1,5 +1,12 @@
 const cardTemplate = document.querySelector('#card').content.querySelector('.popup');
 
+const TYPE_DICTIONARY = {
+  'palace': 'Дворец',
+  'flat': 'Квартира',
+  'house': 'Дом',
+  'bungalow': 'Бунгало',
+};
+
 const renderFeatures = (element, array) => {
   element.innerHTML = '';
   const newFeaturesFragment = document.createDocumentFragment();
@@ -33,7 +40,7 @@ const renderCard = ({ author, offer }) => {
   element.querySelector('.popup__title').textContent = offer.title;
   element.querySelector('.popup__text--address').textContent = offer.address;
   offer.price ? element.querySelector('.popup__text--price').textContent = `${offer.price} ₽/ночь` : element.querySelector('.popup__text--price').remove();
-  element.querySelector('.popup__type').textContent = offer.type;
+  element.querySelector('.popup__type').textContent = TYPE_DICTIONARY[offer.type];
   offer.rooms && offer.guests ? element.querySelector('.popup__text--capacity').textContent = `${offer.rooms} комнаты для ${offer.guests} гостей` : element.querySelector('.popup__text--capacity').remove();
   offer.checkin && offer.checkout ? element.querySelector('.popup__text--time').textContent = `Заезд после ${offer.checkin}, выезд до ${offer.checkout}` : element.querySelector('.popup__text--time').remove();
 
