@@ -131,7 +131,9 @@ const setFormSubmit = (onSuccess, onFail) => {
 
     const formData = new FormData(evt.target);
 
-    sendData(onSuccess, onFail, formData);
+    sendData(formData)
+      .then(() => onSuccess())
+      .catch(() => onFail());
   });
 };
 

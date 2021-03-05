@@ -118,9 +118,8 @@ const initMap = () => {
   map.on('load', () => {
     togglePageState(true);
     initForm();
-    getData((ads) => {
-      renderMarkers(ads);
-    });
+    getData()
+      .then((ads) => renderMarkers(ads));
   })
     .setView({
       lat: TOKYO_LATITUDE,

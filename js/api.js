@@ -1,13 +1,10 @@
-const getData = (onSuccess) => {
-  fetch('https://22.javascript.pages.academy/keksobooking/data')
-    .then((response) => response.json())
-    .then((ads) => {
-      onSuccess(ads);
-    });
+const getData = () => {
+  return fetch('https://22.javascript.pages.academy/keksobooking/data')
+    .then((response) => response.json());
 };
 
-const sendData = (onSuccess, onFail, body) => {
-  fetch('https://22.javascript.pages.academy/keksobooking',
+const sendData = (body) => {
+  return fetch('https://22.javascript.pages.academy/keksobooking',
     {
       method: 'POST',
       body,
@@ -15,13 +12,10 @@ const sendData = (onSuccess, onFail, body) => {
   )
     .then((response) => {
       if (response.ok) {
-        onSuccess();
+        return Promise.resolve();
       } else {
-        onFail();
+        return Promise.reject();
       }
-    })
-    .catch(() => {
-      onFail();
     })
 };
 
