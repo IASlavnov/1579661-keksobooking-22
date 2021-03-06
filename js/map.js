@@ -1,7 +1,7 @@
 /* global L:readonly */
 import { initForm } from './form.js';
-import { renderCard } from './render-cards.js';
-import { getAds } from './data.js';
+import { renderCard } from './render-card.js';
+import { getData } from './api.js';
 
 const TOKYO_LATITUDE = 35.68950;
 const TOKYO_LONGITUDE = 139.69171;
@@ -12,8 +12,9 @@ const MAIN_PIN_HEIGHT = 52;
 const PIN_WIDTH = 40;
 const PIN_HEIGHT = 40;
 
-// Тестовые данные
-const points = getAds();
+// Карта
+const map = L.map('map-canvas');
+
 // Поле ввода адреса и формы
 const adForm = document.querySelector('.ad-form');
 const mapFilters = document.querySelector('.map__filters');
@@ -38,7 +39,7 @@ const togglePageState = (isMapInit) => {
   }
 };
 
-const setTileLayer = (map) => {
+const setTileLayer = () => {
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -46,8 +47,25 @@ const setTileLayer = (map) => {
   ).addTo(map);
 };
 
+
 // Создание главного пина
-const renderMainMarker = (map) => {
+const mainMarker = L.marker(
+  {
+    lat: TOKYO_LATITUDE,
+    lng: TOKYO_LONGITUDE,
+  },
+  {
+    draggable: true,
+  },
+);
+
+// Возвращаем начальное положение метки
+const setMainMarkerDefault = () => {
+  mainMarker.setLatLng(L.latLng(TOKYO_LATITUDE, TOKYO_LONGITUDE));
+};
+
+// Создание главного пина
+const renderMainMarker = () => {
   // Создали иконку для пина
   const mainPinIcon = L.icon({
     iconUrl: 'img/main-pin.svg',
@@ -55,18 +73,7 @@ const renderMainMarker = (map) => {
     iconAnchor: [MAIN_PIN_WIDTH / 2, MAIN_PIN_HEIGHT],
   });
 
-  // Создали пин
-  const mainMarker = L.marker(
-    {
-      lat: TOKYO_LATITUDE,
-      lng: TOKYO_LONGITUDE,
-    },
-    {
-      draggable: true,
-      icon: mainPinIcon,
-    },
-  );
-
+  mainMarker.setIcon(mainPinIcon);
   mainMarker.addTo(map);
 
   mainMarker.on('move', (evt) => {
@@ -76,7 +83,7 @@ const renderMainMarker = (map) => {
 };
 
 // Создание обычных пинов
-const renderMarkers = (map, array) => {
+const renderMarkers = (array) => {
   array.forEach((value) => {
     // Создали иконку для пина
     const pinIcon = L.icon({
@@ -88,39 +95,40 @@ const renderMarkers = (map, array) => {
     // Создали пины
     const marker = L.marker(
       {
-        lat: value.location.x,
-        lng: value.location.y,
+        lat: value.location.lat,
+        lng: value.location.lng,
       },
       {
         icon: pinIcon,
       });
 
-    // Добавили пины с балунами
-    marker.addTo(map).bindPopup(renderCard(value),
+    marker.bindPopup(renderCard(value),
       {
         keepInView: true,
       },
     );
+
+    marker.addTo(map);
   });
 };
 
 // Инициализация карты
 const initMap = () => {
   togglePageState(false);
-  const map = L.map('map-canvas').on('load', () => {
+  map.on('load', () => {
     togglePageState(true);
     initForm();
+    getData()
+      .then((ads) => renderMarkers(ads));
   })
     .setView({
       lat: TOKYO_LATITUDE,
       lng: TOKYO_LONGITUDE,
     }, ZOOM_MAP);
 
-  setTileLayer(map);
+  setTileLayer();
 
-  renderMainMarker(map);
-
-  renderMarkers(map, points);
+  renderMainMarker();
 };
 
-export { initMap };
+export { initMap, setMainMarkerDefault };

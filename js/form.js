@@ -1,3 +1,8 @@
+import { sendData } from './api.js';
+import { setMainMarkerDefault } from './map.js';
+import { showMessage, removeMessage } from './messages.js';
+import { isEscEvent } from './util.js';
+
 const MIN_TITLE_LENGTH = 30;
 const MAX_TITLE_LENGTH = 100;
 const TYPE_MIN_PRICE = {
@@ -24,6 +29,8 @@ const formTitle = form.querySelector('#title');
 const formRoomNumber = form.querySelector('#room_number');
 // Количество мест
 const formCapacity = form.querySelector('#capacity');
+// Кнопка сброса
+const formReset = form.querySelector('.ad-form__reset');
 
 const validationRoomCapacity = () => {
   if (parseInt(formRoomNumber.value) === 1 && parseInt(formCapacity.value) !== 1) {
@@ -41,6 +48,7 @@ const validationRoomCapacity = () => {
   formCapacity.reportValidity();
 };
 
+// Валидация формы
 const validationForm = () => {
   formPrice.addEventListener('input', () => {
     if (formPrice.value < parseInt(formPrice.min)) {
@@ -77,6 +85,59 @@ const validationForm = () => {
   });
 };
 
+// Сброс формы
+const resetForm = () => {
+  form.reset();
+  setMainMarkerDefault();
+};
+
+// Действия при успешной отправке
+const successSubmit = () => {
+  resetForm();
+  const message = showMessage(true);
+
+  document.addEventListener('click', () => {
+    removeMessage(message);
+  }, { once: true });
+
+  document.addEventListener('keydown', (evt) => {
+    if (isEscEvent(evt)) {
+      evt.preventDefault();
+      removeMessage(message);
+    }
+  }, { once: true });
+};
+
+// Действия при ошибке отправки
+const errorSubmit = () => {
+  const message = showMessage(false);
+
+  document.addEventListener('click', () => {
+    removeMessage(message);
+  }, { once: true });
+
+  document.addEventListener('keydown', (evt) => {
+    if (isEscEvent(evt)) {
+      evt.preventDefault();
+      removeMessage(message);
+    }
+  }, { once: true });
+};
+
+// Отправка формы
+const setFormSubmit = (onSuccess, onFail) => {
+  form.addEventListener('submit', (evt) => {
+    evt.preventDefault();
+
+    const formData = new FormData(evt.target);
+
+    sendData(formData)
+      .then(() => onSuccess())
+      .catch(() => onFail());
+  });
+};
+
+// Инициализация формы
 const initForm = () => {
   formTime.addEventListener('change', (evt) => {
     evt.target === timeIn ? timeOut.selectedIndex = timeIn.selectedIndex : timeIn.selectedIndex = timeOut.selectedIndex;
@@ -93,6 +154,10 @@ const initForm = () => {
   });
 
   validationForm();
+
+  setFormSubmit(successSubmit, errorSubmit);
+
+  formReset.addEventListener('click', resetForm);
 };
 
 export { initForm };
