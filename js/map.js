@@ -1,8 +1,9 @@
 /* global L:readonly */
+/* global _:readonly */
 import { initForm } from './form.js';
 import { renderCard } from './render-card.js';
 import { getData } from './api.js';
-import { filterByType } from './filters.js';
+import { filterByType, filterByPrice, filterByRooms, filterByGuests, filterByFeatures } from './filters.js';
 
 const TOKYO_LATITUDE = 35.68950;
 const TOKYO_LONGITUDE = 139.69171;
@@ -15,19 +16,25 @@ const PIN_HEIGHT = 40;
 const ANY_CHOICE_FILTERS = 'any';
 // Количество объявлений
 const ADS_COUNT = 10;
+const RERENDER_DELAY = 500;
 
 // Карта
 const map = L.map('map-canvas');
 // Массив пинов для объявлений
 const markers = [];
+// Объект для фильтра
+const filterObject = {
+  housingType: ANY_CHOICE_FILTERS,
+  housingPrice: ANY_CHOICE_FILTERS,
+  housingRooms: ANY_CHOICE_FILTERS,
+  housingGuests: ANY_CHOICE_FILTERS,
+  housingFeatures: [],
+};
 
 // Поле ввода адреса и формы
 const adForm = document.querySelector('.ad-form');
 const mapFilters = document.querySelector('.map__filters');
 const inputAddress = adForm.querySelector('#address');
-
-// Фильтры
-const typeFilter = mapFilters.querySelector('#housing-type');
 
 // Переключение состояния фильтров
 const toggleMapFiltersState = (isMapInit) => {
@@ -97,11 +104,15 @@ const removeAllMarkers = (markers) => {
 };
 
 // Создание обычных пинов
-const renderMarkers = (ads, type = ANY_CHOICE_FILTERS) => {
+const renderMarkers = (ads, filter) => {
   // Копируем, чтобы не повредить исходные данные с сервера, фильтруем по типу
   const filteredAds = ads
     .slice()
-    .filter((value) => filterByType(value, type));
+    .filter((value) => filterByType(value, filter.housingType))
+    .filter((value) => filterByPrice(value, filter.housingPrice))
+    .filter((value) => filterByRooms(value, filter.housingRooms))
+    .filter((value) => filterByGuests(value, filter.housingGuests))
+    .filter((value) => filterByFeatures(value, filterObject.housingFeatures));
 
   if (markers.length) {
     removeAllMarkers(markers);
@@ -141,6 +152,32 @@ const renderMarkers = (ads, type = ANY_CHOICE_FILTERS) => {
     });
 };
 
+// Собираем объект с данными о выбранных фильтрах
+const setFilterObject = (evt) => {
+  if (evt.target.parentElement.id === 'housing-features') {
+    if (filterObject.housingFeatures.includes(evt.target.value)) {
+      let index = filterObject.housingFeatures.findIndex(value => value === evt.target.value);
+      filterObject.housingFeatures.splice(index, 1);
+    } else {
+      filterObject.housingFeatures.push(evt.target.value);
+    }
+  }
+  switch (evt.target.id) {
+    case 'housing-type':
+      filterObject.housingType = evt.target.value;
+      break;
+    case 'housing-price':
+      filterObject.housingPrice = evt.target.value;
+      break;
+    case 'housing-rooms':
+      filterObject.housingRooms = evt.target.value;
+      break;
+    case 'housing-guests':
+      filterObject.housingGuests = evt.target.value;
+      break;
+  }
+};
+
 // Инициализация карты
 const initMap = () => {
   toggleMapFiltersState(false);
@@ -150,8 +187,13 @@ const initMap = () => {
     initForm();
     getData()
       .then((ads) => {
-        renderMarkers(ads.slice(0, ADS_COUNT));
-        typeFilter.addEventListener('change', (evt) => renderMarkers(ads, evt.target.value));
+        renderMarkers(ads, filterObject);
+        mapFilters.addEventListener('change', (evt) => {
+          setFilterObject(evt);
+          // renderMarkers(ads, filterObject);
+          // Что-то здесь явно не работает!
+          _.debounce(renderMarkers(ads, filterObject), RERENDER_DELAY);
+        });
       })
       .then(() => toggleMapFiltersState(true));
   })
