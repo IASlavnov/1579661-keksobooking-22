@@ -2,6 +2,7 @@
 import { initForm } from './form.js';
 import { renderCard } from './render-card.js';
 import { getData } from './api.js';
+import { filterByType } from './filters.js';
 
 const TOKYO_LATITUDE = 35.68950;
 const TOKYO_LONGITUDE = 139.69171;
@@ -11,6 +12,7 @@ const MAIN_PIN_WIDTH = 52;
 const MAIN_PIN_HEIGHT = 52;
 const PIN_WIDTH = 40;
 const PIN_HEIGHT = 40;
+const ANY_CHOICE_FILTERS = 'any';
 // Количество объявлений
 const ADS_COUNT = 10;
 
@@ -89,31 +91,24 @@ const renderMainMarker = () => {
   });
 };
 
-// Создание обычных пинов
-const renderMarkers = (array, type = 'any') => {
-  // Копируем, чтобы не повредить исходные данные с сервера, фильтруем по типу
-  const newArray = array
-    .slice()
-    .filter((value) => {
-      if (type === 'any') {
-        return true;
-      }
-      if (value.offer.type === type) {
-        return true;
-      } else {
-        return false;
-      }
-    });
+// Удаление всех маркеров с карты
+const removeAllMarkers = (markers) => {
+  markers.forEach(value => value.remove())
+};
 
-  // Удаляем пины с карты, если нужна перерисовка (например фильтр)
+// Создание обычных пинов
+const renderMarkers = (ads, type = ANY_CHOICE_FILTERS) => {
+  // Копируем, чтобы не повредить исходные данные с сервера, фильтруем по типу
+  const filteredAds = ads
+    .slice()
+    .filter((value) => filterByType(value, type));
+
   if (markers.length) {
-    markers.forEach((value) => {
-      value.remove();
-    })
+    removeAllMarkers(markers);
   }
 
   // Работаем с отфильтрованным массивом
-  newArray
+  filteredAds
     // Не больше 10 объявлений
     .slice(0, ADS_COUNT)
     .forEach((value) => {
