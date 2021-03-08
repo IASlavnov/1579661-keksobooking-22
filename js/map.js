@@ -2,6 +2,7 @@
 import { initForm } from './form.js';
 import { renderCard } from './render-card.js';
 import { getData } from './api.js';
+import { filterByType } from './filters.js';
 
 const TOKYO_LATITUDE = 35.68950;
 const TOKYO_LONGITUDE = 139.69171;
@@ -11,34 +12,42 @@ const MAIN_PIN_WIDTH = 52;
 const MAIN_PIN_HEIGHT = 52;
 const PIN_WIDTH = 40;
 const PIN_HEIGHT = 40;
+const ANY_CHOICE_FILTERS = 'any';
+// Количество объявлений
+const ADS_COUNT = 10;
 
 // Карта
 const map = L.map('map-canvas');
+// Массив пинов для объявлений
+const markers = [];
 
 // Поле ввода адреса и формы
 const adForm = document.querySelector('.ad-form');
 const mapFilters = document.querySelector('.map__filters');
 const inputAddress = adForm.querySelector('#address');
 
-// Переключение состояния страницы в зависимости от инициализации карты
-const togglePageState = (isMapInit) => {
+// Фильтры
+const typeFilter = mapFilters.querySelector('#housing-type');
+
+// Переключение состояния фильтров
+const toggleMapFiltersState = (isMapInit) => {
   for (let element of mapFilters.children) {
     element.disabled = !isMapInit;
   }
 
+  isMapInit ? mapFilters.classList.remove('map__filters--disabled') : mapFilters.classList.add('map__filters--disabled');
+};
+
+// Переключение состояния формы
+const toggleFormState = (isMapInit) => {
   for (let element of adForm.children) {
     element.disabled = !isMapInit;
   }
 
-  if (isMapInit) {
-    adForm.classList.remove('ad-form--disabled');
-    mapFilters.classList.remove('map__filters--disabled');
-  } else {
-    adForm.classList.add('ad-form--disabled');
-    mapFilters.classList.add('map__filters--disabled');
-  }
+  isMapInit ? adForm.classList.remove('ad-form--disabled') : adForm.classList.add('ad-form--disabled');
 };
 
+// Добавили слой карты
 const setTileLayer = () => {
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     {
@@ -82,44 +91,69 @@ const renderMainMarker = () => {
   });
 };
 
-// Создание обычных пинов
-const renderMarkers = (array) => {
-  array.forEach((value) => {
-    // Создали иконку для пина
-    const pinIcon = L.icon({
-      iconUrl: 'img/pin.svg',
-      iconSize: [PIN_WIDTH, PIN_HEIGHT],
-      iconAnchor: [PIN_WIDTH / 2, PIN_HEIGHT],
-    });
+// Удаление всех маркеров с карты
+const removeAllMarkers = (markers) => {
+  markers.forEach(value => value.remove())
+};
 
-    // Создали пины
-    const marker = L.marker(
-      {
-        lat: value.location.lat,
-        lng: value.location.lng,
-      },
-      {
-        icon: pinIcon,
+// Создание обычных пинов
+const renderMarkers = (ads, type = ANY_CHOICE_FILTERS) => {
+  // Копируем, чтобы не повредить исходные данные с сервера, фильтруем по типу
+  const filteredAds = ads
+    .slice()
+    .filter((value) => filterByType(value, type));
+
+  if (markers.length) {
+    removeAllMarkers(markers);
+  }
+
+  // Работаем с отфильтрованным массивом
+  filteredAds
+    // Не больше 10 объявлений
+    .slice(0, ADS_COUNT)
+    .forEach((value) => {
+      // Создали иконку для пина
+      const pinIcon = L.icon({
+        iconUrl: 'img/pin.svg',
+        iconSize: [PIN_WIDTH, PIN_HEIGHT],
+        iconAnchor: [PIN_WIDTH / 2, PIN_HEIGHT],
       });
 
-    marker.bindPopup(renderCard(value),
-      {
-        keepInView: true,
-      },
-    );
+      // Создали пины
+      const marker = L.marker(
+        {
+          lat: value.location.lat,
+          lng: value.location.lng,
+        },
+        {
+          icon: pinIcon,
+        });
 
-    marker.addTo(map);
-  });
+      marker.bindPopup(renderCard(value),
+        {
+          keepInView: true,
+        },
+      );
+
+      // Добавили в массив и на карту
+      markers.push(marker);
+      marker.addTo(map);
+    });
 };
 
 // Инициализация карты
 const initMap = () => {
-  togglePageState(false);
+  toggleMapFiltersState(false);
+  toggleFormState(false);
   map.on('load', () => {
-    togglePageState(true);
+    toggleFormState(true);
     initForm();
     getData()
-      .then((ads) => renderMarkers(ads));
+      .then((ads) => {
+        renderMarkers(ads.slice(0, ADS_COUNT));
+        typeFilter.addEventListener('change', (evt) => renderMarkers(ads, evt.target.value));
+      })
+      .then(() => toggleMapFiltersState(true));
   })
     .setView({
       lat: TOKYO_LATITUDE,
