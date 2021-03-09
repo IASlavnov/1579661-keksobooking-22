@@ -16,6 +16,13 @@ const PIN_HEIGHT = 40;
 const ANY_CHOICE_FILTERS = 'any';
 // Количество объявлений
 const ADS_COUNT = 10;
+// Константы для сбора объекта по выбранным фильтрам
+const HOUSING_TYPE = 'housing-type';
+const HOUSING_PRICE = 'housing-price';
+const HOUSING_ROOMS = 'housing-rooms';
+const HOUSING_GUESTS = 'housing-guests';
+const HOUSING_FEATURES = 'housing-features';
+// Задержка для _.debounce()
 const RERENDER_DELAY = 500;
 
 // Карта
@@ -108,11 +115,11 @@ const renderMarkers = (ads, filter) => {
   // Копируем, чтобы не повредить исходные данные с сервера, фильтруем по типу
   const filteredAds = ads
     .slice()
-    .filter((value) => filterByType(value, filter.housingType))
-    .filter((value) => filterByPrice(value, filter.housingPrice))
-    .filter((value) => filterByRooms(value, filter.housingRooms))
-    .filter((value) => filterByGuests(value, filter.housingGuests))
-    .filter((value) => filterByFeatures(value, filterObject.housingFeatures));
+    .filter((value) => {
+      return filterByType(value, filter.housingType) && filterByPrice(value, filter.housingPrice)
+        && filterByGuests(value, filter.housingGuests) && filterByRooms(value, filter.housingRooms)
+        && filterByFeatures(value, filterObject.housingFeatures);
+    });
 
   if (markers.length) {
     removeAllMarkers(markers);
@@ -154,7 +161,7 @@ const renderMarkers = (ads, filter) => {
 
 // Собираем объект с данными о выбранных фильтрах
 const setFilterObject = (evt) => {
-  if (evt.target.parentElement.id === 'housing-features') {
+  if (evt.target.parentElement.id === HOUSING_FEATURES) {
     if (filterObject.housingFeatures.includes(evt.target.value)) {
       let index = filterObject.housingFeatures.findIndex(value => value === evt.target.value);
       filterObject.housingFeatures.splice(index, 1);
@@ -163,16 +170,16 @@ const setFilterObject = (evt) => {
     }
   }
   switch (evt.target.id) {
-    case 'housing-type':
+    case HOUSING_TYPE:
       filterObject.housingType = evt.target.value;
       break;
-    case 'housing-price':
+    case HOUSING_PRICE:
       filterObject.housingPrice = evt.target.value;
       break;
-    case 'housing-rooms':
+    case HOUSING_ROOMS:
       filterObject.housingRooms = evt.target.value;
       break;
-    case 'housing-guests':
+    case HOUSING_GUESTS:
       filterObject.housingGuests = evt.target.value;
       break;
   }
@@ -188,12 +195,10 @@ const initMap = () => {
     getData()
       .then((ads) => {
         renderMarkers(ads, filterObject);
-        mapFilters.addEventListener('change', (evt) => {
+        mapFilters.addEventListener('change', _.debounce((evt) => {
           setFilterObject(evt);
-          // renderMarkers(ads, filterObject);
-          // Что-то здесь явно не работает!
-          _.debounce(renderMarkers(ads, filterObject), RERENDER_DELAY);
-        });
+          renderMarkers(ads, filterObject);
+        }, RERENDER_DELAY));
       })
       .then(() => toggleMapFiltersState(true));
   })
