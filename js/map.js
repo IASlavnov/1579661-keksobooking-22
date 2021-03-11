@@ -1,8 +1,9 @@
 /* global L:readonly */
+/* global _:readonly */
 import { initForm } from './form.js';
 import { renderCard } from './render-card.js';
 import { getData } from './api.js';
-import { filterByType } from './filters.js';
+import { getFilterObject, getFilteredData } from './filters.js';
 
 const TOKYO_LATITUDE = 35.68950;
 const TOKYO_LONGITUDE = 139.69171;
@@ -12,9 +13,11 @@ const MAIN_PIN_WIDTH = 52;
 const MAIN_PIN_HEIGHT = 52;
 const PIN_WIDTH = 40;
 const PIN_HEIGHT = 40;
-const ANY_CHOICE_FILTERS = 'any';
 // Количество объявлений
 const ADS_COUNT = 10;
+
+// Задержка для _.debounce()
+const RERENDER_DELAY = 500;
 
 // Карта
 const map = L.map('map-canvas');
@@ -25,9 +28,6 @@ const markers = [];
 const adForm = document.querySelector('.ad-form');
 const mapFilters = document.querySelector('.map__filters');
 const inputAddress = adForm.querySelector('#address');
-
-// Фильтры
-const typeFilter = mapFilters.querySelector('#housing-type');
 
 // Переключение состояния фильтров
 const toggleMapFiltersState = (isMapInit) => {
@@ -97,11 +97,11 @@ const removeAllMarkers = (markers) => {
 };
 
 // Создание обычных пинов
-const renderMarkers = (ads, type = ANY_CHOICE_FILTERS) => {
+const renderMarkers = (ads, filter) => {
   // Копируем, чтобы не повредить исходные данные с сервера, фильтруем по типу
   const filteredAds = ads
     .slice()
-    .filter((value) => filterByType(value, type));
+    .filter((value) => getFilteredData(value, filter));
 
   if (markers.length) {
     removeAllMarkers(markers);
@@ -141,6 +141,10 @@ const renderMarkers = (ads, type = ANY_CHOICE_FILTERS) => {
     });
 };
 
+const onFiltersChanged = _.debounce((ads, filterObject) => {
+  renderMarkers(ads, filterObject)
+}, RERENDER_DELAY);
+
 // Инициализация карты
 const initMap = () => {
   toggleMapFiltersState(false);
@@ -150,8 +154,12 @@ const initMap = () => {
     initForm();
     getData()
       .then((ads) => {
-        renderMarkers(ads.slice(0, ADS_COUNT));
-        typeFilter.addEventListener('change', (evt) => renderMarkers(ads, evt.target.value));
+        const filterObject = getFilterObject();
+        renderMarkers(ads, filterObject);
+        mapFilters.addEventListener('change', (evt) => {
+          const filterObject = getFilterObject(evt);
+          onFiltersChanged(ads, filterObject);
+        });
       })
       .then(() => toggleMapFiltersState(true));
   })
