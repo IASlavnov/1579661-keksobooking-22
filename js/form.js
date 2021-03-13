@@ -2,6 +2,7 @@ import { sendData } from './api.js';
 import { setMainMarkerDefault } from './map.js';
 import { showMessage, removeMessage } from './messages.js';
 import { isEscEvent } from './util.js';
+import { resetPreviews } from './upload-files.js';
 
 const MIN_TITLE_LENGTH = 30;
 const MAX_TITLE_LENGTH = 100;
@@ -13,6 +14,7 @@ const TYPE_MIN_PRICE = {
 };
 
 const form = document.querySelector('.ad-form');
+const mapFilters = document.querySelector('.map__filters');
 
 // Время заезда и выезда
 const formTime = form.querySelector('.ad-form__element--time');
@@ -88,6 +90,8 @@ const validationForm = () => {
 // Сброс формы
 const resetForm = () => {
   form.reset();
+  resetPreviews();
+  mapFilters.reset();
   setMainMarkerDefault();
 };
 

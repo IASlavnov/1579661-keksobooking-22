@@ -4,6 +4,7 @@ import { initForm } from './form.js';
 import { renderCard } from './render-card.js';
 import { getData } from './api.js';
 import { getFilterObject, getFilteredData } from './filters.js';
+import { uploadPreviews } from './upload-files.js';
 
 const TOKYO_LATITUDE = 35.68950;
 const TOKYO_LONGITUDE = 139.69171;
@@ -141,9 +142,7 @@ const renderMarkers = (ads, filter) => {
     });
 };
 
-const onFiltersChanged = _.debounce((ads, filterObject) => {
-  renderMarkers(ads, filterObject)
-}, RERENDER_DELAY);
+const onFiltersChanged = _.debounce(renderMarkers, RERENDER_DELAY);
 
 // Инициализация карты
 const initMap = () => {
@@ -152,6 +151,7 @@ const initMap = () => {
   map.on('load', () => {
     toggleFormState(true);
     initForm();
+    uploadPreviews();
     getData()
       .then((ads) => {
         const filterObject = getFilterObject();
