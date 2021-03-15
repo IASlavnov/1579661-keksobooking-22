@@ -9,6 +9,8 @@ const showMessage = (isSuccess) => {
     element = successTemplate.cloneNode(true);
   }
 
+  // Перекрываем сообщением карту. При 900 кнопки +/- видны у карты
+  element.style.zIndex = 1000;
   main.appendChild(element);
 
   return element;
