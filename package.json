@@ -18,7 +18,9 @@
     "webpack-cli": "4.5.0"
   },
   "license": "MIT",
-  "dependencies": {},
+  "dependencies": {
+    "leaflet": "1.7.1"
+  },
   "scripts": {
     "build": "webpack --mode production",
     "start": "browser-sync start --server \"build/\" --no-ui --files \"source/**/*.js\"",
