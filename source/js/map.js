@@ -173,4 +173,4 @@ const initMap = () => {
   renderMainMarker();
 };
 
-export { initMap, setMainMarkerDefault };
+export { initMap, setMainMarkerDefault, renderMarkers };

@@ -1,7 +1,9 @@
-import { sendData } from './api.js';
+import { getData, sendData } from './api.js';
 import { setMainMarkerDefault } from './map.js';
 import { showMessage, removeMessage } from './messages.js';
 import { isEscEvent } from './util.js';
+import { renderMarkers } from './map.js';
+import { getFilterObject } from './filters.js';
 import { resetPreviews } from './upload-files.js';
 
 const MIN_TITLE_LENGTH = 30;
@@ -92,12 +94,16 @@ const resetForm = () => {
   form.reset();
   resetPreviews();
   mapFilters.reset();
+  getData().then((ads) => {
+    const filterObject = getFilterObject();
+    renderMarkers(ads, filterObject);
+  });
   setMainMarkerDefault();
 };
 
 // Действия при успешной отправке
 const successSubmit = () => {
-  resetForm();
+  // resetForm();
   const message = showMessage(true);
 
   document.addEventListener('click', () => {
@@ -110,6 +116,7 @@ const successSubmit = () => {
       removeMessage(message);
     }
   }, { once: true });
+  resetForm();
 };
 
 // Действия при ошибке отправки

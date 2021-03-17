@@ -28,10 +28,21 @@ const filterObject = {
   housingFeatures: [],
 };
 
+//
+const getInitialFilterObject = () => {
+  filterObject.housingType = FilterValues.ANY;
+  filterObject.housingPrice = FilterValues.ANY;
+  filterObject.housingRooms = FilterValues.ANY;
+  filterObject.housingGuests = FilterValues.ANY;
+  filterObject.housingFeatures = [];
+
+  return filterObject;
+};
+
 // Собираем объект с данными о выбранных фильтрах
 const getFilterObject = (evt = FilterValues.ANY) => {
   if (evt === FilterValues.ANY) {
-    return filterObject;
+    return getInitialFilterObject();
   } else {
     if (evt.target.parentElement.id === FilterTypes.HOUSING_FEATURES) {
       if (filterObject.housingFeatures.includes(evt.target.value)) {
