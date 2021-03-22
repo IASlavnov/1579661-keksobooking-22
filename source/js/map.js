@@ -144,25 +144,28 @@ const renderMarkers = (ads, filter) => {
 
 const onFiltersChanged = _.debounce(renderMarkers, RERENDER_DELAY);
 
+// Действия при загрузке карты
+const onMapLoad = () => {
+  toggleFormState(true);
+  initForm();
+  uploadPreviews();
+  getData()
+    .then((ads) => {
+      const filterObject = getFilterObject();
+      renderMarkers(ads, filterObject);
+      mapFilters.addEventListener('change', (evt) => {
+        const filterObject = getFilterObject(evt);
+        onFiltersChanged(ads, filterObject);
+      });
+    })
+    .then(() => toggleMapFiltersState(true));
+};
+
 // Инициализация карты
 const initMap = () => {
   toggleMapFiltersState(false);
   toggleFormState(false);
-  map.on('load', () => {
-    toggleFormState(true);
-    initForm();
-    uploadPreviews();
-    getData()
-      .then((ads) => {
-        const filterObject = getFilterObject();
-        renderMarkers(ads, filterObject);
-        mapFilters.addEventListener('change', (evt) => {
-          const filterObject = getFilterObject(evt);
-          onFiltersChanged(ads, filterObject);
-        });
-      })
-      .then(() => toggleMapFiltersState(true));
-  })
+  map.on('load', onMapLoad)
     .setView({
       lat: TOKYO_LATITUDE,
       lng: TOKYO_LONGITUDE,

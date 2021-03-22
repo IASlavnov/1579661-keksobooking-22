@@ -1,11 +1,14 @@
-const cardTemplate = document.querySelector('#card').content.querySelector('.popup');
-
+const PHOTO_WIDTH = 45;
+const PHOTO_HEIGHT = 40;
+const PHOTO_ALT = 'Фотография жилья';
 const TYPE_DICTIONARY = {
   'palace': 'Дворец',
   'flat': 'Квартира',
   'house': 'Дом',
   'bungalow': 'Бунгало',
 };
+
+const cardTemplate = document.querySelector('#card').content.querySelector('.popup');
 
 const renderFeatures = (element, array) => {
   element.innerHTML = '';
@@ -25,10 +28,10 @@ const renderPhotos = (element, array) => {
   array.forEach((value) => {
     const newPhotoItem = document.createElement('img');
     newPhotoItem.classList.add('popup__photo');
-    newPhotoItem.width = 45;
-    newPhotoItem.height = 40;
+    newPhotoItem.width = PHOTO_WIDTH;
+    newPhotoItem.height = PHOTO_HEIGHT;
     newPhotoItem.src = value;
-    newPhotoItem.alt = 'Фотография жилья';
+    newPhotoItem.alt = PHOTO_ALT;
     newPhotosFragment.appendChild(newPhotoItem);
   });
   return newPhotosFragment;

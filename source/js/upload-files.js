@@ -1,3 +1,6 @@
+const PHOTO_WIDTH = 70;
+const PHOTO_HEIGHT = 70;
+const PHOTO_ALT = 'Фотография жилья';
 const FILE_TYPES = ['jpg', 'jpeg', 'png'];
 
 const adForm = document.querySelector('.ad-form');
@@ -43,10 +46,10 @@ const uploadPhoto = () => {
 
       reader.addEventListener('load', () => {
         const newPhotoItem = document.createElement('img');
-        newPhotoItem.width = 70;
-        newPhotoItem.height = 70;
+        newPhotoItem.width = PHOTO_WIDTH;
+        newPhotoItem.height = PHOTO_HEIGHT;
         newPhotoItem.src = reader.result;
-        newPhotoItem.alt = 'Фотография жилья';
+        newPhotoItem.alt = PHOTO_ALT;
         photoPreview.appendChild(newPhotoItem);
       });
 

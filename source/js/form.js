@@ -14,6 +14,17 @@ const TYPE_MIN_PRICE = {
   'house': 5000,
   'bungalow': 0,
 };
+const RoomNumber = {
+  ONE_ROOM: 1,
+  TWO_ROOMS: 2,
+  THREE_ROOMS: 3,
+  ONE_HUNDRED_ROOMS: 100,
+};
+const RoomCapacity = {
+  NOT_FOR_GUESTS: 0,
+  ONE_GUEST: 1,
+  TWO_GUESTS: 2,
+};
 
 const form = document.querySelector('.ad-form');
 const mapFilters = document.querySelector('.map__filters');
@@ -37,13 +48,17 @@ const formCapacity = form.querySelector('#capacity');
 const formReset = form.querySelector('.ad-form__reset');
 
 const validationRoomCapacity = () => {
-  if (parseInt(formRoomNumber.value) === 1 && parseInt(formCapacity.value) !== 1) {
+  if (parseInt(formRoomNumber.value) === RoomNumber.ONE_ROOM && parseInt(formCapacity.value) !== RoomCapacity.ONE_GUEST) {
     formCapacity.setCustomValidity('Для 1 комнаты подходит только вариант - 1 гость');
-  } else if (parseInt(formRoomNumber.value) === 2 && parseInt(formCapacity.value) !== 1 && parseInt(formCapacity.value) !== 2) {
+  } else if (parseInt(formRoomNumber.value) === RoomNumber.TWO_ROOMS
+    && parseInt(formCapacity.value) !== RoomCapacity.ONE_GUEST
+    && parseInt(formCapacity.value) !== RoomCapacity.TWO_GUESTS) {
     formCapacity.setCustomValidity('Для 2 комнат подходят варианты - 1 или 2 гостя');
-  } else if (parseInt(formRoomNumber.value) === 3 && parseInt(formCapacity.value) === 0) {
+  } else if (parseInt(formRoomNumber.value) === RoomNumber.THREE_ROOMS
+    && parseInt(formCapacity.value) === RoomCapacity.NOT_FOR_GUESTS) {
     formCapacity.setCustomValidity('Для 3 комнат подходят варианты - 1, 2 или 3 гостя');
-  } else if (parseInt(formRoomNumber.value) === 100 && parseInt(formCapacity.value) !== 0) {
+  } else if (parseInt(formRoomNumber.value) === RoomNumber.ONE_HUNDRED_ROOMS
+    && parseInt(formCapacity.value) !== RoomCapacity.NOT_FOR_GUESTS) {
     formCapacity.setCustomValidity('Для 100 комнат подходит вариант - не для гостей');
   } else {
     formCapacity.setCustomValidity('');
@@ -101,38 +116,34 @@ const resetForm = () => {
   setMainMarkerDefault();
 };
 
+const onMessageClick = () => {
+  removeMessage();
+};
+
+const onMessageEscKeydown = (evt) => {
+  if (isEscEvent(evt)) {
+    evt.preventDefault();
+    removeMessage();
+  }
+};
+
 // Действия при успешной отправке
 const successSubmit = () => {
-  // resetForm();
-  const message = showMessage(true);
+  showMessage(true);
 
-  document.addEventListener('click', () => {
-    removeMessage(message);
-  }, { once: true });
+  document.addEventListener('click', onMessageClick, { once: true });
 
-  document.addEventListener('keydown', (evt) => {
-    if (isEscEvent(evt)) {
-      evt.preventDefault();
-      removeMessage(message);
-    }
-  }, { once: true });
+  document.addEventListener('keydown', onMessageEscKeydown, { once: true });
   resetForm();
 };
 
 // Действия при ошибке отправки
 const errorSubmit = () => {
-  const message = showMessage(false);
+  showMessage(false);
 
-  document.addEventListener('click', () => {
-    removeMessage(message);
-  }, { once: true });
+  document.addEventListener('click', onMessageClick, { once: true });
 
-  document.addEventListener('keydown', (evt) => {
-    if (isEscEvent(evt)) {
-      evt.preventDefault();
-      removeMessage(message);
-    }
-  }, { once: true });
+  document.addEventListener('keydown', onMessageEscKeydown, { once: true });
 };
 
 // Отправка формы
@@ -171,4 +182,4 @@ const initForm = () => {
   formReset.addEventListener('click', resetForm);
 };
 
-export { initForm };
+export { initForm, onMessageEscKeydown, onMessageClick };
