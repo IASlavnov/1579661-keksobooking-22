@@ -46,7 +46,7 @@ const formCapacity = form.querySelector('#capacity');
 // Кнопка сброса
 const formReset = form.querySelector('.ad-form__reset');
 
-const validationRoomCapacity = () => {
+const validateRoomCapacity = () => {
   if (parseInt(formRoomNumber.value) === RoomNumber.ONE_ROOM && parseInt(formCapacity.value) !== RoomCapacity.ONE_GUEST) {
     formCapacity.setCustomValidity('Для 1 комнаты подходит только вариант - 1 гость');
   } else if (parseInt(formRoomNumber.value) === RoomNumber.TWO_ROOMS
@@ -67,7 +67,7 @@ const validationRoomCapacity = () => {
 };
 
 // Валидация формы
-const validationForm = () => {
+const validateForm = () => {
   formPrice.addEventListener('input', () => {
     if (formPrice.value < parseInt(formPrice.min)) {
       formPrice.setCustomValidity(`Введите значение больше чем ${formPrice.min}`)
@@ -95,16 +95,16 @@ const validationForm = () => {
   });
 
   formRoomNumber.addEventListener('change', () => {
-    validationRoomCapacity();
+    validateRoomCapacity();
   });
 
   formCapacity.addEventListener('change', () => {
-    validationRoomCapacity();
+    validateRoomCapacity();
   });
 };
 
 // Сброс формы
-const resetForm = () => {
+const onFormReset = () => {
   form.reset();
   resetPreviews();
   mapFilters.reset();
@@ -116,13 +116,13 @@ const resetForm = () => {
 };
 
 // Действия при успешной отправке
-const successSubmit = () => {
+const onSuccessSubmit = () => {
   showMessage(true);
-  resetForm();
+  onFormReset();
 };
 
 // Действия при ошибке отправки
-const errorSubmit = () => {
+const onErrorSubmit = () => {
   showMessage(false);
 };
 
@@ -155,11 +155,11 @@ const initForm = () => {
     formPrice.dispatchEvent(eventInput);
   });
 
-  validationForm();
+  validateForm();
 
-  setFormSubmit(successSubmit, errorSubmit);
+  setFormSubmit(onSuccessSubmit, onErrorSubmit);
 
-  formReset.addEventListener('click', resetForm);
+  formReset.addEventListener('click', onFormReset);
 };
 
 export { initForm };
