@@ -1,7 +1,6 @@
 import { getData, sendData } from './api.js';
 import { setMainMarkerDefault } from './map.js';
-import { showMessage, removeMessage } from './messages.js';
-import { isEscEvent } from './util.js';
+import { showMessage } from './messages.js';
 import { renderMarkers } from './map.js';
 import { getFilterObject } from './filters.js';
 import { resetPreviews } from './upload-files.js';
@@ -116,34 +115,15 @@ const resetForm = () => {
   setMainMarkerDefault();
 };
 
-const onMessageClick = () => {
-  removeMessage();
-};
-
-const onMessageEscKeydown = (evt) => {
-  if (isEscEvent(evt)) {
-    evt.preventDefault();
-    removeMessage();
-  }
-};
-
 // Действия при успешной отправке
 const successSubmit = () => {
   showMessage(true);
-
-  document.addEventListener('click', onMessageClick, { once: true });
-
-  document.addEventListener('keydown', onMessageEscKeydown, { once: true });
   resetForm();
 };
 
 // Действия при ошибке отправки
 const errorSubmit = () => {
   showMessage(false);
-
-  document.addEventListener('click', onMessageClick, { once: true });
-
-  document.addEventListener('keydown', onMessageEscKeydown, { once: true });
 };
 
 // Отправка формы
@@ -182,4 +162,4 @@ const initForm = () => {
   formReset.addEventListener('click', resetForm);
 };
 
-export { initForm, onMessageEscKeydown, onMessageClick };
+export { initForm };
